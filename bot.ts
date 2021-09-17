@@ -41,8 +41,8 @@ client.on('interactionCreate', async (interaction) => {
 
 // old-style commands
 client.on('messageCreate', (message) => {
-  if (message.content === "!meme") {
-    message.reply("Meme!!");
+  if (client.user && message.mentions.has(client.user.id)) {
+    message.reply("<:eh:883119732105019423>")
   }
 })
 

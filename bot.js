@@ -43,8 +43,11 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
 }));
 // old-style commands
 client.on('messageCreate', (message) => {
-    if (message.content === "!meme") {
-        message.reply("Meme!!");
+    /* if (message.content === "!meme") {
+      message.reply("Meme!!");
+    }*/
+    if (client.user && message.mentions.has(client.user.id)) {
+        message.reply("<:eh:883119732105019423>");
     }
 });
 client.login(config_json_1.BOT_TOKEN);
