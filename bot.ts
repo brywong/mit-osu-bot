@@ -1,7 +1,10 @@
 import { Client, Intents } from "discord.js";
 
-console.log(meme(34))
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] })
 
-function meme(x: number): string {
-  return `${x}`;
-}
+client.once('ready', () => {
+  console.log("Bot started")
+})
+
+// TODO: get a discord bot token
+// client.login(token);
