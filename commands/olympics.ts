@@ -201,7 +201,7 @@ export async function invalidateSubmission(
       if (event == "B9") {
         return "Deleted your feet pics :<";
       } else {
-        return "successfully deleted";
+        return `Successfully deleted ${event}`;
       }
     }
     return "Failed to delete D:";
