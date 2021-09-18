@@ -13,6 +13,7 @@ import TwigCommand from "./commands/twig";
 import InvalidCommand from "./commands/invalid";
 import DeletemyCommand from "./commands/deletemy";
 import ViewCommand from "./commands/view";
+import LeaderboardCommand from "./commands/leaderboard";
 
 Database.init();
 const client = new Client({
@@ -29,19 +30,11 @@ const commands = [
   InvalidCommand,
   DeletemyCommand,
   ViewCommand,
+  LeaderboardCommand,
 ];
+
 const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
-
-const oldCommands = [
-  new SlashCommandBuilder()
-    .setName("leaderboard")
-    .setDescription("View Oly leaderboard (only number of submissions)"),
-  new SlashCommandBuilder()
-    .setName("lb")
-    .setDescription("View Oly leaderboard (only number of submissions)"),
-].map((cmd) => cmd.toJSON());
-
-const slashCommands = [...commands.map((c) => c.slashCommand), ...oldCommands];
+const slashCommands = commands.map((c) => c.slashCommand);
 
 async function registerSlashCommands() {
   console.log("Registering slash commands");
@@ -58,7 +51,6 @@ client.once("ready", () => {
   console.log("Bot started");
 });
 
-// new slash commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
   if (
@@ -72,14 +64,8 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName in commandsMap) {
     await commandsMap[commandName].handle(interaction, client);
   }
-
-  if (commandName === "leaderboard" || commandName === "lb") {
-    const board = await getOlympicsBoard(client);
-    await interaction.reply(board);
-  }
 });
 
-// old-style commands
 client.on("messageCreate", async (message) => {
   if (!client.user) return;
 
