@@ -9,6 +9,7 @@ import { checkIsAdmin } from "./src/regular";
 import {
   registerSubmission,
   processSubmissionContent,
+  invalidateSubmission,
   getOlympicsBoard,
 } from "./src/olympics";
 import Database from "./db";
@@ -51,8 +52,8 @@ const commands = [
     )
     .addUserOption((option) =>
       option
-        .setName("player")
-        .setDescription("Player whose event we are invalidating")
+        .setName("user")
+        .setDescription("User whose event we are invalidating")
         .setRequired(true)
     ),
   new SlashCommandBuilder()
@@ -89,7 +90,12 @@ client.on("interactionCreate", async (interaction) => {
     await registerSubmission(interaction);
   } else if (commandName == "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
-      await interaction.reply("Not Implemented Error!!");
+      const success = await invalidateSubmission(interaction);
+      if (success) {
+        interaction.reply("Successfully deleted")
+      } else {
+        interaction.reply("Failed to delete for some reaosn D:")
+      }
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
