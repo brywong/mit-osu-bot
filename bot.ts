@@ -6,7 +6,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { Routes } from "discord-api-types/v9";
 
 import { checkIsAdmin } from "./src/regular";
-import { registerSubmission } from "./src/olympics";
+import { registerSubmission, getOlympicsBoard } from "./src/olympics";
 import Database from "./db";
 
 Database.init();
@@ -38,10 +38,10 @@ const commands = [
     .setDescription("Invalidates an entry. Can only be used by Olympics admin"),
   new SlashCommandBuilder()
     .setName("leaderboard")
-    .setDescription("View Oly leaderboard"),
+    .setDescription("View Oly leaderboard (only number of submissions)"),
   new SlashCommandBuilder()
     .setName("lb")
-    .setDescription("View Oly leaderboard"),
+    .setDescription("View Oly leaderboard (only number of submissions)"),
 ].map((cmd) => cmd.toJSON());
 
 async function registerSlashCommands() {
@@ -67,7 +67,8 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "twig") {
     await interaction.reply("chika");
   } else if (commandName == "submit") {
-    await interaction.reply(registerSubmission(interaction));
+    const result = await registerSubmission(interaction);
+    interaction.reply(result);
   } else if (commandName == "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       await interaction.reply("Not Implemented Error!!");
@@ -75,7 +76,8 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
   } else if (commandName == "leaderboard" || commandName == "lb") {
-    await interaction.reply("Not Implemented Error!!");
+    const board = await getOlympicsBoard()
+    await interaction.reply(board);
   }
 });
 
