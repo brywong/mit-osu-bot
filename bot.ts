@@ -70,7 +70,10 @@ client.on("messageCreate", async (message) => {
     message.mentions.repliedUser?.id === client.user.id
   ) {
     processSubmissionContent(message);
-  } else if (message.content.includes("<:eh")) {
+  } else if (
+    message.content.includes("<:eh") &&
+    message.author.id !== client.user.id
+  ) {
     message.reply("<:eh:883119732105019423>");
   }
 });
