@@ -46,18 +46,14 @@ export async function invalidateSubmission(
   const event = interaction.options.getString("event")?.toUpperCase();
 
   if (isValidEventType(event)) {
-    let existing: any;
-    if (user) {
-      existing = await deleteSubmission(user.id, event);
-    } else {
-      existing = await deleteSubmission(interaction.user.id, event);
-    }
+    const targetUser = user ?? interaction.user;
+    const existing = await deleteSubmission(targetUser.id, event);
 
     if (existing["deletedCount"] === 1) {
       if (event === "B9") {
         return "Deleted your feet pics :<";
       } else {
-        return `Successfully deleted ${event}`;
+        return `Successfully deleted ${event} from ${targetUser}`;
       }
     }
     return `No submission for ${event} found`;
