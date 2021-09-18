@@ -64,7 +64,7 @@ const commands = [
     .setName("lb")
     .setDescription("View Oly leaderboard (only number of submissions)"),
   new SlashCommandBuilder()
-    .setName("submissions")
+    .setName("view")
     .setDescription("View submissions by a user and/or event type")
     .addStringOption((option) =>
       option.setName("event").setDescription("Event to filter by")
@@ -102,9 +102,9 @@ client.on("interactionCreate", async (interaction) => {
     if (checkIsAdmin(interaction.user.id)) {
       const success = await invalidateSubmission(interaction);
       if (success) {
-        interaction.reply("Successfully deleted")
+        interaction.reply("Successfully deleted");
       } else {
-        interaction.reply("Failed to delete for some reason D:")
+        interaction.reply("Failed to delete for some reason D:");
       }
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
@@ -112,7 +112,7 @@ client.on("interactionCreate", async (interaction) => {
   } else if (commandName === "leaderboard" || commandName === "lb") {
     const board = await getOlympicsBoard(client);
     await interaction.reply(board);
-  } else if (commandName === "submissions") {
+  } else if (commandName === "view") {
     await viewSubmissions(client, interaction);
   }
 });
@@ -127,7 +127,7 @@ client.on("messageCreate", async (message) => {
   ) {
     processSubmissionContent(message);
   } else if (message.content.includes("<:eh")) {
-    message.reply("<:eh:883119732105019423>")
+    message.reply("<:eh:883119732105019423>");
   }
 });
 
