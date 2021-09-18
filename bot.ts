@@ -6,7 +6,11 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { Routes } from "discord-api-types/v9";
 
 import { checkIsAdmin } from "./src/regular";
-import { registerSubmission, processSubmissionContent } from "./src/olympics";
+import {
+  registerSubmission,
+  processSubmissionContent,
+  getOlympicsBoard,
+} from "./src/olympics";
 import Database from "./db";
 
 Database.init();
@@ -38,10 +42,10 @@ const commands = [
     .setDescription("Invalidates an entry. Can only be used by Olympics admin"),
   new SlashCommandBuilder()
     .setName("leaderboard")
-    .setDescription("View Oly leaderboard"),
+    .setDescription("View Oly leaderboard (only number of submissions)"),
   new SlashCommandBuilder()
     .setName("lb")
-    .setDescription("View Oly leaderboard"),
+    .setDescription("View Oly leaderboard (only number of submissions)"),
 ].map((cmd) => cmd.toJSON());
 
 async function registerSlashCommands() {
@@ -75,7 +79,8 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
   } else if (commandName == "leaderboard" || commandName == "lb") {
-    await interaction.reply("Not Implemented Error!!");
+    const board = await getOlympicsBoard();
+    await interaction.reply(board);
   }
 });
 

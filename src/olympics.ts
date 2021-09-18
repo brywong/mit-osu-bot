@@ -1,6 +1,6 @@
 /*** Bot's Olympics functionality ***/
 
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, Formatters, Message } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
 import { getLeaderboard } from "./utils";
@@ -98,10 +98,23 @@ function invalidateSubmission(interaction: CommandInteraction): boolean {
 }
 
 /** Get the current board of submissions for users */
-function getOlympicsBoard() {
+export async function getOlympicsBoard(): Promise<string> {
   /*
         Gets the current board of Olympics submissions (just a table of
         users to things they submitted)
     */
-  return {};
+  const result: Submission[] = await SubmissionModel.find({ complete: true });
+
+  const eventsPerPersons = { foo: 10, bar: 12 };
+  const orderedPeople = Object.keys(eventsPerPersons).sort();
+  return Formatters.codeBlock(
+    orderedPeople
+      .map(
+        (name, idx) =>
+          `${idx + 1} ${name}: ${
+            eventsPerPersons[name as keyof typeof eventsPerPersons]
+          }`
+      )
+      .join("\n")
+  );
 }
