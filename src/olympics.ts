@@ -14,12 +14,13 @@ async function getIncompleteSubmission(
   });
 }
 
-async function getCompleteSubmission(
-  userId: string
+async function getSubmissionForEvent(
+  userId: string,
+  event: EventType
 ): Promise<Submission | undefined> {
   return await SubmissionModel.findOne({
     userIds: { $elemMatch: { $eq: userId } },
-    complete: true,
+    event,
   });
 }
 
@@ -47,6 +48,18 @@ export async function registerSubmission(interaction: CommandInteraction) {
     */
   const event = interaction.options.getString("name")?.toUpperCase();
   if (isValidEventType(event)) {
+    const existing = await getSubmissionForEvent(interaction.user.id, event);
+
+    if (existing?.complete) {
+      const msg = await interaction.reply({
+        content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}, but you can reply to this to submit another file/link`,
+        fetchReply: true,
+      });
+      existing.replyRef = msg.id;
+      await existing.save();
+      return;
+    }
+
     const msg = await interaction.reply({
       content: `**[REPLY TO SUBMIT ${event}]** Please send ${EVENT_TYPES_MAP[event]}`,
       fetchReply: true,
@@ -84,7 +97,7 @@ export async function processSubmissionContent(message: Message) {
   submission.complete = true;
   await submission.save();
   const reply = await message.reply(
-    `Succesfully submitted \`${content}\` for ${submission.event}. To attach more, reply again to the above message.`
+    `Succesfully submitted \`${content}\` for ${submission.event}. To attach more, reply again to the message above.`
   );
 }
 
