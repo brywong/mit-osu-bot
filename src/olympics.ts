@@ -1,6 +1,6 @@
 /*** Bot's Olympics functionality ***/
 
-import { CommandInteraction, Formatters, Client } from "discord.js";
+import { CommandInteraction, Formatters, Client, Message } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
 import { getLeaderboard } from "./utils";
@@ -47,6 +47,16 @@ export async function registerSubmission(interaction: CommandInteraction) {
         for the event
     */
   const event = interaction.options.getString("name")?.toUpperCase();
+  const otherUsers = interaction.options.getString("users");
+
+  const userIds = [interaction.user.id];
+  if (otherUsers) {
+    const otherUserUids = [...otherUsers.matchAll(/<@!?(\d+)>/g)].map(
+      (match) => match[1]
+    );
+    userIds.push(...otherUserUids);
+  }
+
   if (isValidEventType(event)) {
     const existing = await getSubmissionForEvent(interaction.user.id, event);
 
@@ -111,32 +121,33 @@ function invalidateSubmission(interaction: CommandInteraction): boolean {
 }
 
 /** Get the current board of submissions for users */
-export async function getOlympicsBoard(client : Client): Promise<string> {
-    /*
+export async function getOlympicsBoard(client: Client): Promise<string> {
+  /*
         Gets the current board of Olympics submissions (just a table of
         users to things they submitted)
     */
-    const result: Submission[] = await SubmissionModel.find({"complete": true})
-    const eventsPerPersons: {[key: string]: number} = {}
-    for (var i = 0; i < result.length; i++) {
-        const s = result[i]
-        const userids = s.userIds
-        for (var j=0; j<userids.length; j++) {
-            const uid = userids[j]
-            const User = await client.users.fetch(uid, {cache:true})
-            if (User === undefined) {
-                throw "User doesn't exist?! Unexpected"; 
-            }
-            if (uid in eventsPerPersons) {
-                eventsPerPersons[User.tag] += 1
-            } else {
-                eventsPerPersons[User.tag] = 1
-            }
-        }
+  const result: Submission[] = await SubmissionModel.find({ complete: true });
+  const eventsPerPersons: { [key: string]: number } = {};
+  for (var i = 0; i < result.length; i++) {
+    const s = result[i];
+    const userids = s.userIds;
+    for (var j = 0; j < userids.length; j++) {
+      const uid = userids[j];
+      const User = await client.users.fetch(uid, { cache: true });
+      if (User === undefined) {
+        throw "User doesn't exist?! Unexpected";
+      }
+      if (uid in eventsPerPersons) {
+        eventsPerPersons[User.tag] += 1;
+      } else {
+        eventsPerPersons[User.tag] = 1;
+      }
     }
-    const orderedPeople = Object.keys(eventsPerPersons).sort()
-    return Formatters.codeBlock(
-            orderedPeople.map((name, idx) => `${idx+1} ${name}: ${eventsPerPersons[name]}`)
-            .join('\n'),
-    );
+  }
+  const orderedPeople = Object.keys(eventsPerPersons).sort();
+  return Formatters.codeBlock(
+    orderedPeople
+      .map((name, idx) => `${idx + 1} ${name}: ${eventsPerPersons[name]}`)
+      .join("\n")
+  );
 }
