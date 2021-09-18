@@ -29,10 +29,10 @@ function invalidateSubmission(interaction: CommandInteraction): boolean {
 }
 
 /** Get the current board of submissions for users */
-function getOlympicsBoard() {
+async function getOlympicsBoard() {
     /*
         Gets the current board of Olympics submissions (just a table of
         users to things they submitted)
     */
-    const leaderboard = getLeaderboard()
+    const result: Submission[] = await SubmissionModel.find({"complete": true})
 }
