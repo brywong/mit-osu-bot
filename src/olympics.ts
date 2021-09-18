@@ -1,18 +1,48 @@
 /*** Bot's Olympics functionality ***/
 
-import { Interaction } from "discord.js" 
+import { CommandInteraction } from "discord.js" 
+
+const EVENT_ABVS = [
+    "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+    "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9",
+    "B10", "B11", "B12", "B13", "B14", "B15",
+    "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8",
+]
+const EVENT_TYPES = {
+    "F1": "screenshot",
+    "F2": "screenshot",
+    "F3": "screenshot",
+    "F4": "screenshot",
+    "F5": "multiple screenshots, one for each of your scores",
+    "F6": "image containing both your score and your sandwich",
+    "F7": "screenshot",
+    "F8": "screenshot",
+    "F9": "screenshot",
+}
+
+/** Generic Olympics POST */
+function POST(uname: String, content: any) : boolean {
+    return false;
+}
 
 /** Register a new submission */
-function registerSubmission(interaction: Interaction) : void {
+function registerSubmission(interaction: CommandInteraction) : String {
     /*
         Given a submission from a player in the form of
-        /submit <EVENT_NAME> message.content, submit this information
-        to a database of Olympics submissions
+        /submit <EVENT_NAME>, request the correct submissions information
+        for the event
     */
+   var event = interaction.options.getString("name")
+   if (event != null) {
+       event = event.toString()
+       if (EVENT_ABVS.includes(event)) {
+           return "Submit your".concat(' ', EVENT_TYPES[event].String())
+       }
+   }
 }
 
 /** Validate the new submission via reaction */
-function invalidateSubmission(interaction: Interaction) : boolean {
+function invalidateSubmission(interaction: CommandInteraction) : boolean {
     /*
         Allows judges to invalidate a specified user's submission 
         for an event via /invalid @user <EVENT_NAME>. Updates the databse

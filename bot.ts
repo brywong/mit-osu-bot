@@ -5,6 +5,8 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 import { Routes } from 'discord-api-types/v9'
 
+import { checkIsAdmin } from 'src/regular.js';
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 
 const guildId = '661656176244686858';
@@ -12,7 +14,11 @@ const clientId = '888306044558802965';
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
 const commands = [
-  new SlashCommandBuilder().setName('twig').setDescription("Replies with 'chika'")
+  new SlashCommandBuilder().setName('twig').setDescription("Replies with 'chika'"),
+  new SlashCommandBuilder().setName('submit').setDescription("Submit an entry for osu! olympics. Format /submit <EVENT_ABV>"),
+  new SlashCommandBuilder().setName('invalid').setDescription("Invalidates an entry. Can only be used by Olympics admin"),
+  new SlashCommandBuilder().setName('leaderboard').setDescription("View Oly leaderboard"),
+  new SlashCommandBuilder().setName('lb').setDescription("View Oly leaderboard")
 ].map(cmd => cmd.toJSON())
 
 async function registerSlashCommands() {
@@ -36,6 +42,16 @@ client.on('interactionCreate', async (interaction) => {
   const { commandName } = interaction;
   if (commandName === "twig") {
     await interaction.reply("chika")
+  } else if (commandName == "submit") {
+    await interaction.reply("Not Implemented Error!!")
+  } else if (commandName == "invalid") {
+    if (checkIsAdmin(interaction.user.id)) {
+      await interaction.reply("Not Implemented Error!!")
+    } else {
+      await interaction.reply("Non-admins can't invalidate entries D:")
+    }
+  } else if (commandName == "leaderboard" || commandName == "lb") {
+    await interaction.reply("Not Implemented Error!!")
   }
 })
 
