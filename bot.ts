@@ -6,6 +6,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { Routes } from 'discord-api-types/v9'
 
 import { checkIsAdmin } from 'src/regular.js';
+import { registerSubmission } from 'src/olympics.js';
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 
@@ -43,7 +44,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === "twig") {
     await interaction.reply("chika")
   } else if (commandName == "submit") {
-    await interaction.reply("Not Implemented Error!!")
+    await interaction.reply(registerSubmission(interaction))
   } else if (commandName == "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       await interaction.reply("Not Implemented Error!!")

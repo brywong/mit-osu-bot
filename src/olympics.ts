@@ -8,6 +8,7 @@ const EVENT_ABVS = [
     "B10", "B11", "B12", "B13", "B14", "B15",
     "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8",
 ]
+
 const EVENT_TYPES = {
     "F1": "screenshot",
     "F2": "screenshot",
@@ -20,9 +21,15 @@ const EVENT_TYPES = {
     "F9": "screenshot",
 }
 
+type EventType = keyof typeof EVENT_TYPES
+
 /** Generic Olympics POST */
-function POST(uname: String, content: any) : boolean {
+function POST(uname: String, event: EventType, content: any) : boolean {
     return false;
+}
+
+function isValidEventType(event: string | null): event is EventType {
+    return event !== null && event in EVENT_TYPES;
 }
 
 /** Register a new submission */
@@ -32,13 +39,11 @@ function registerSubmission(interaction: CommandInteraction) : String {
         /submit <EVENT_NAME>, request the correct submissions information
         for the event
     */
-   var event = interaction.options.getString("name")
-   if (event != null) {
-       event = event.toString()
-       if (EVENT_ABVS.includes(event)) {
-           return "Submit your".concat(' ', EVENT_TYPES[event].String())
-       }
+   const event = interaction.options.getString("name")
+   if (isValidEventType(event)) {
+        return "Submit your".concat(' ', EVENT_TYPES[event])
    }
+   return "Invalid event submitted D:";
 }
 
 /** Validate the new submission via reaction */
