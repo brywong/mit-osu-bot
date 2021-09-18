@@ -47,6 +47,16 @@ export async function registerSubmission(interaction: CommandInteraction) {
         for the event
     */
   const event = interaction.options.getString("name")?.toUpperCase();
+  const otherUsers = interaction.options.getString("users");
+
+  const userIds = [interaction.user.id];
+  if (otherUsers) {
+    const otherUserUids = [...otherUsers.matchAll(/<@!?(\d+)>/g)].map(
+      (match) => match[1]
+    );
+    userIds.push(...otherUserUids);
+  }
+
   if (isValidEventType(event)) {
     const existing = await getSubmissionForEvent(interaction.user.id, event);
 

@@ -28,14 +28,17 @@ const commands = [
     .setDescription("Replies with 'chika'"),
   new SlashCommandBuilder()
     .setName("submit")
-    .setDescription(
-      "Submit an entry for osu! olympics. Format /submit <EVENT_ABV>"
-    )
+    .setDescription("Submit an entry for osu! olympics")
     .addStringOption((option) =>
       option
         .setName("name")
         .setDescription("Abbreviated event name")
         .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("users")
+        .setDescription("Other users to submit for (for team events)")
     ),
   new SlashCommandBuilder()
     .setName("invalid")
