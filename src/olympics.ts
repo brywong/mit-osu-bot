@@ -57,34 +57,50 @@ export async function registerSubmission(interaction: CommandInteraction) {
     userIds.push(...otherUserUids);
   }
 
-  if (isValidEventType(event)) {
-    const existing = await getSubmissionForEvent(interaction.user.id, event);
+  if (!isValidEventType(event)) {
+    interaction.reply("Invalid event submitted D:");
+    return;
+  }
 
-    if (existing?.complete) {
-      const msg = await interaction.reply({
-        content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}, but you can reply to this to submit another file/link`,
-        fetchReply: true,
-      });
-      existing.replyRef = msg.id;
-      await existing.save();
-      return;
-    }
+  const existing = await getSubmissionForEvent(interaction.user.id, event);
 
+  if (existing && existing.complete) {
+    // Case 1: User calls /submit after already completing a submission for this event
     const msg = await interaction.reply({
-      content: `**[REPLY TO SUBMIT ${event}]** Please send ${EVENT_TYPES_MAP[event]}`,
+      content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}, but you can reply to this to submit another file/link`,
       fetchReply: true,
     });
-
-    const submission = new SubmissionModel({
-      userIds: [interaction.user.id],
-      complete: false,
-      event: event,
-      replyRef: msg.id,
-    });
-    await submission.save();
-  } else {
-    interaction.reply("Invalid event submitted D:");
+    existing.replyRef = msg.id;
+    await existing.save();
+    return;
   }
+
+  if (existing && !existing.complete) {
+    // Case 2: User calls /submit after starting (but not completing) a submission for this event
+    const msg = await interaction.reply({
+      content: `**[REPLY TO SUBMIT ${event}]** Reply with ${EVENT_TYPES_MAP[event]} (You previously used /submit ${event} but never replied!)`,
+      fetchReply: true,
+    });
+    existing.userIds = userIds;
+    existing.replyRef = msg.id;
+    await existing.save();
+    return;
+  }
+
+  // Case 3: User calls /submit EVENT for the first time
+  const msg = await interaction.reply({
+    content: `**[REPLY TO SUBMIT ${event}]** Reply with ${EVENT_TYPES_MAP[event]}`,
+    fetchReply: true,
+  });
+
+  const submission = new SubmissionModel({
+    userIds,
+    complete: false,
+    event: event,
+    replyRef: msg.id,
+  });
+
+  await submission.save();
 }
 
 export async function processSubmissionContent(message: Message) {
