@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 import { EventType } from "../types"
 
 export interface Submission {
-  userId: string;
-  teamUserIds?: string[];
+  userIds: string[];
+  complete: boolean;
   eventType: EventType;
   content: string;
 }
 
 const SubmissionSchema = new mongoose.Schema<Submission>({
-  userId: { type: String, required: true },
-  teamUserIds: [String],
+  userIds: { type: [String], required: true },
+  complete: { type: Boolean, required: true },
   eventType: { type: String, required: true },
   content: { type: String, required: true },
 });

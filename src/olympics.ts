@@ -1,6 +1,7 @@
 /*** Bot's Olympics functionality ***/
 
 import { CommandInteraction } from "discord.js"
+import { SubmissionModel } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types"
 
 /** Generic Olympics POST */
