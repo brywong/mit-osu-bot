@@ -14,6 +14,8 @@ const config_json_1 = require("./config.json");
 const rest_1 = require("@discordjs/rest");
 const builders_1 = require("@discordjs/builders");
 const v9_1 = require("discord-api-types/v9");
+const regular_1 = require("./src/regular");
+const olympics_1 = require("./src/olympics");
 const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES] });
 const guildId = '661656176244686858';
 const clientId = '888306044558802965';
@@ -42,13 +44,18 @@ client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0
         return;
     const { commandName } = interaction;
     if (commandName === "twig") {
-        yield interaction.reply("chika".concat(' ', interaction.user.id));
+        yield interaction.reply("chika");
     }
     else if (commandName == "submit") {
-        yield interaction.reply("Not Implemented Error!!");
+        yield interaction.reply((0, olympics_1.registerSubmission)(interaction));
     }
     else if (commandName == "invalid") {
-        yield interaction.reply("Not Implemented Error!!");
+        if ((0, regular_1.checkIsAdmin)(interaction.user.id)) {
+            yield interaction.reply("Not Implemented Error!!");
+        }
+        else {
+            yield interaction.reply("Non-admins can't invalidate entries D:");
+        }
     }
     else if (commandName == "leaderboard" || commandName == "lb") {
         yield interaction.reply("Not Implemented Error!!");

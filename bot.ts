@@ -5,8 +5,8 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 import { Routes } from 'discord-api-types/v9'
 
-import { checkIsAdmin } from 'src/regular.js';
-import { registerSubmission } from 'src/olympics.js';
+import { checkIsAdmin } from './src/regular';
+import { registerSubmission } from './src/olympics';
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 

@@ -33,7 +33,7 @@ function isValidEventType(event: string | null): event is EventType {
 }
 
 /** Register a new submission */
-function registerSubmission(interaction: CommandInteraction) : String {
+export function registerSubmission(interaction: CommandInteraction) : string {
     /*
         Given a submission from a player in the form of
         /submit <EVENT_NAME>, request the correct submissions information
