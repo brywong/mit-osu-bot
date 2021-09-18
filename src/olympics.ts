@@ -6,6 +6,8 @@ import {
   Client,
   Message,
   User,
+  MessageEmbed,
+  MessagePayload,
 } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
@@ -146,7 +148,7 @@ export async function viewSubmissions(
   interaction: CommandInteraction
 ) {
   const user = interaction.options.getUser("user");
-  const event = interaction.options.getString("event");
+  const event = interaction.options.getString("event")?.toUpperCase();
   if (!user && !event) {
     interaction.reply("At least one option must be specified");
     return;
@@ -175,13 +177,33 @@ export async function viewSubmissions(
     uidsToUsername[uid] = (await client.users.fetch(uid, { cache: true })).tag;
   }
 
-  const submissionStrings = submissions.map(
-    (submission) =>
-      `Event ${submission.event} by ${submission.userIds
-        .map((uid) => uidsToUsername[uid])
-        .join(", ")}: ${submission.content?.join("\n")}`
+  let title: string;
+  if (user && event) {
+    title = `Submissions for ${user.tag} on Event ${event}`;
+  } else if (user) {
+    title = `All submissions for ${user.tag}`;
+  } else {
+    title = `All submissions for ${event}`;
+  }
+
+  const submissionFields = submissions.map((submission) => {
+    const usernames = submission.userIds.map((uid) => uidsToUsername[uid]);
+    return {
+      name: `Event ${submission.event} by ${usernames.join(", ")}`,
+      value: submission.content!.join("\n"),
+    };
+  });
+
+  interaction.reply(
+    new MessagePayload(interaction, {
+      embeds: [
+        new MessageEmbed()
+          .setColor("#0099ff")
+          .setTitle(title)
+          .addFields(submissionFields),
+      ],
+    })
   );
-  interaction.reply(submissionStrings.join("\n\n"));
 }
 
 /** Validate the new submission via reaction */

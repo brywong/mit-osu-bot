@@ -73,7 +73,7 @@ const commands = [
     .setName("lb")
     .setDescription("View Oly leaderboard (only number of submissions)"),
   new SlashCommandBuilder()
-    .setName("submissions")
+    .setName("view")
     .setDescription("View submissions by a user and/or event type")
     .addStringOption((option) =>
       option.setName("event").setDescription("Event to filter by")
@@ -126,7 +126,7 @@ client.on("interactionCreate", async (interaction) => {
   } else if (commandName === "leaderboard" || commandName === "lb") {
     const board = await getOlympicsBoard(client);
     await interaction.reply(board);
-  } else if (commandName === "submissions") {
+  } else if (commandName === "view") {
     await viewSubmissions(client, interaction);
   }
 });
