@@ -1,18 +1,18 @@
-import mongoose from "mongoose";
-import { EventType } from "../types"
+import mongoose, { Document } from "mongoose";
+import { EventType } from "../types";
 
-export interface Submission {
+export interface Submission extends Document {
   userIds: string[];
   complete: boolean;
   eventType: EventType;
-  content: string;
+  content?: string;
 }
 
 const SubmissionSchema = new mongoose.Schema<Submission>({
   userIds: { type: [String], required: true },
   complete: { type: Boolean, required: true },
   eventType: { type: String, required: true },
-  content: { type: String, required: true },
+  content: String,
 });
 
 export const SubmissionModel = mongoose.model("Submission", SubmissionSchema);

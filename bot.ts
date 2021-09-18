@@ -67,7 +67,8 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "twig") {
     await interaction.reply("chika");
   } else if (commandName == "submit") {
-    await interaction.reply(registerSubmission(interaction));
+    const result = await registerSubmission(interaction);
+    interaction.reply(result);
   } else if (commandName == "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       await interaction.reply("Not Implemented Error!!");
