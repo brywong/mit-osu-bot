@@ -62,7 +62,7 @@ export async function registerSubmission(interaction: CommandInteraction) {
         /submit <EVENT_NAME>, request the correct submissions information
         for the event
     */
-  const event = interaction.options.getString("name")?.toUpperCase();
+  const event = interaction.options.getString("event")?.toUpperCase();
   const otherUsers = interaction.options.getString("users");
 
   const userIds = [interaction.user.id];
@@ -147,11 +147,10 @@ export async function viewSubmissions(
   client: Client,
   interaction: CommandInteraction
 ) {
-  const user = interaction.options.getUser("user");
+  let user = interaction.options.getUser("user");
   const event = interaction.options.getString("event")?.toUpperCase();
   if (!user && !event) {
-    interaction.reply("At least one option must be specified");
-    return;
+    user = interaction.user!; // if no params provided, filter to current user
   }
 
   const filter: any = { complete: true };
@@ -224,7 +223,7 @@ export async function invalidateSubmission(
         for an event via /invalid @user <EVENT_NAME>. Updates the databse
     */
   const uid = interaction.options.getUser("user");
-  const event = interaction.options.getString("name")?.toUpperCase();
+  const event = interaction.options.getString("event")?.toUpperCase();
 
   if (isValidEventType(event)) {
     let existing: any;

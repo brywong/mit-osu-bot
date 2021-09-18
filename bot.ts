@@ -33,7 +33,7 @@ const commands = [
     .setDescription("Submit an entry for osu! olympics")
     .addStringOption((option) =>
       option
-        .setName("name")
+        .setName("event")
         .setDescription("Abbreviated event name")
         .setRequired(true)
     )
@@ -47,7 +47,7 @@ const commands = [
     .setDescription("Invalidates an entry. Can only be used by Olympics admin")
     .addStringOption((option) =>
       option
-        .setName("name")
+        .setName("event")
         .setDescription("Abbreviated event name")
         .setRequired(true)
     )
@@ -62,7 +62,7 @@ const commands = [
     .setDescription("Invalidates one of your own entries")
     .addStringOption((option) =>
       option
-        .setName("name")
+        .setName("event")
         .setDescription("Abbreviated event name")
         .setRequired(true)
     ),
