@@ -39,7 +39,19 @@ const commands = [
     ),
   new SlashCommandBuilder()
     .setName("invalid")
-    .setDescription("Invalidates an entry. Can only be used by Olympics admin"),
+    .setDescription("Invalidates an entry. Can only be used by Olympics admin")
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Abbreviated event name")
+        .setRequired(true)
+    )
+    .addUserOption((option) =>
+      option
+        .setName("player")
+        .setDescription("Player whose event we are invalidating")
+        .setRequired(true)
+    ),
   new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("View Oly leaderboard (only number of submissions)"),
