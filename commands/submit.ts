@@ -21,7 +21,7 @@ const SubmitCommand: MitOsuCommand = {
       option
         .setName("users")
         .setDescription("(for team events) Other users to submit for")
-        .setRequired(true)
+        .setRequired(false)
     )
     .toJSON(),
 
@@ -47,10 +47,13 @@ const SubmitCommand: MitOsuCommand = {
     if (existing && existing.complete) {
       // Case 1: User calls /submit after already completing a submission for this event
       const msg = await interaction.reply({
-        content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}, but you can reply to this to submit another file/link`,
+        content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}. Erasing your old submission, now reply with ${EVENT_TYPES_MAP[event]} to submit a new one.`,
         fetchReply: true,
       });
       existing.replyRef = msg.id;
+      existing.content = [];
+      existing.userIds = userIds;
+      existing.complete = false;
       await existing.save();
       return;
     }
