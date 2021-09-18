@@ -18,7 +18,7 @@ const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
 
-const guildId = "661656176244686858";
+const guildIds = ["661656176244686858", "540661791017926657"];
 const clientId = "888306044558802965";
 const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
 
@@ -34,8 +34,8 @@ const commands = [
 const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
 const slashCommands = commands.map((c) => c.slashCommand);
 
-async function registerSlashCommands() {
-  console.log("Registering slash commands");
+async function registerSlashCommands(guildId: string) {
+  console.log(`Registering slash commands for ${guildId}`);
 
   await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
     body: slashCommands,
@@ -43,7 +43,9 @@ async function registerSlashCommands() {
   console.log(`Successfully registered ${slashCommands.length} command(s)`);
 }
 
-registerSlashCommands();
+for (const guildId of guildIds) {
+  registerSlashCommands(guildId);
+}
 
 client.once("ready", () => {
   console.log("Bot started");
@@ -60,6 +62,8 @@ client.on("interactionCreate", async (interaction) => {
 
 client.on("messageCreate", async (message) => {
   if (!client.user) return;
+
+  console.log(message);
 
   if (
     message.type === "REPLY" &&
