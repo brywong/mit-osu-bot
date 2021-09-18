@@ -5,16 +5,13 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 import { Routes } from "discord-api-types/v9";
 
-import { checkIsAdmin } from "./commands/regular";
-import {
-  invalidateSubmission,
-  getOlympicsBoard,
-  viewSubmissions,
-} from "./commands/olympics";
+import { getOlympicsBoard, viewSubmissions } from "./commands/olympics";
 import Database from "./db";
 
 import SubmitCommand, { processSubmissionContent } from "./commands/submit";
 import TwigCommand from "./commands/twig";
+import InvalidCommand from "./commands/invalid";
+import DeletemyCommand from "./commands/deletemy";
 
 Database.init();
 const client = new Client({
@@ -25,34 +22,10 @@ const guildId = "661656176244686858";
 const clientId = "888306044558802965";
 const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
 
-const commands = [SubmitCommand, TwigCommand];
+const commands = [SubmitCommand, TwigCommand, InvalidCommand, DeletemyCommand];
 const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
 
 const oldCommands = [
-  new SlashCommandBuilder()
-    .setName("invalid")
-    .setDescription("Invalidates an entry. Can only be used by Olympics admin")
-    .addStringOption((option) =>
-      option
-        .setName("event")
-        .setDescription("Abbreviated event name")
-        .setRequired(true)
-    )
-    .addUserOption((option) =>
-      option
-        .setName("user")
-        .setDescription("User whose event we are invalidating")
-        .setRequired(true)
-    ),
-  new SlashCommandBuilder()
-    .setName("deletemy")
-    .setDescription("Invalidates one of your own entries")
-    .addStringOption((option) =>
-      option
-        .setName("event")
-        .setDescription("Abbreviated event name")
-        .setRequired(true)
-    ),
   new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("View Oly leaderboard (only number of submissions)"),
@@ -102,17 +75,7 @@ client.on("interactionCreate", async (interaction) => {
     await commandsMap[commandName].handle(interaction);
   }
 
-  if (commandName === "invalid") {
-    if (checkIsAdmin(interaction.user.id)) {
-      const message = await invalidateSubmission(interaction);
-      interaction.reply(message);
-    } else {
-      await interaction.reply("Non-admins can't invalidate entries D:");
-    }
-  } else if (commandName === "deletemy") {
-    const message = await invalidateSubmission(interaction);
-    interaction.reply(message);
-  } else if (commandName === "leaderboard" || commandName === "lb") {
+  if (commandName === "leaderboard" || commandName === "lb") {
     const board = await getOlympicsBoard(client);
     await interaction.reply(board);
   } else if (commandName === "view") {
