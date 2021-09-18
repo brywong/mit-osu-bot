@@ -6,7 +6,11 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { Routes } from "discord-api-types/v9";
 
 import { checkIsAdmin } from "./src/regular";
-import { registerSubmission, getOlympicsBoard } from "./src/olympics";
+import {
+  registerSubmission,
+  processSubmissionContent,
+  getOlympicsBoard,
+} from "./src/olympics";
 import Database from "./db";
 
 Database.init();
@@ -67,8 +71,7 @@ client.on("interactionCreate", async (interaction) => {
   if (commandName === "twig") {
     await interaction.reply("chika");
   } else if (commandName == "submit") {
-    const result = await registerSubmission(interaction);
-    interaction.reply(result);
+    await registerSubmission(interaction);
   } else if (commandName == "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       await interaction.reply("Not Implemented Error!!");
@@ -82,9 +85,14 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 // old-style commands
-client.on("messageCreate", (message) => {
-  if (client.user && message.mentions.has(client.user.id)) {
-    message.reply("<:eh:883119732105019423>");
+client.on("messageCreate", async (message) => {
+  if (!client.user) return;
+
+  if (
+    message.type === "REPLY" &&
+    message.mentions.repliedUser?.id === client.user.id
+  ) {
+    processSubmissionContent(message);
   }
 });
 

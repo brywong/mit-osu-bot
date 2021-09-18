@@ -14,32 +14,91 @@ async function getIncompleteSubmission(
   });
 }
 
+async function getSubmissionForEvent(
+  userId: string,
+  event: EventType
+): Promise<Submission | undefined> {
+  return await SubmissionModel.findOne({
+    userIds: { $elemMatch: { $eq: userId } },
+    event,
+  });
+}
+
+async function getSubmissionForReply(
+  message: Message
+): Promise<Submission | undefined> {
+  const messageId = message.reference?.messageId;
+  const userId = message.author.id;
+  if (!messageId) {
+    return;
+  }
+
+  return await SubmissionModel.findOne({
+    userIds: { $elemMatch: { $eq: userId } },
+    replyRef: messageId,
+  });
+}
+
 /** Register a new submission */
-export async function registerSubmission(
-  interaction: CommandInteraction
-): Promise<string> {
+export async function registerSubmission(interaction: CommandInteraction) {
   /*
         Given a submission from a player in the form of
         /submit <EVENT_NAME>, request the correct submissions information
         for the event
     */
-  const incomplete = await getIncompleteSubmission(interaction.user.id);
-  if (incomplete) {
-    const event = incomplete.eventType;
-    return `Complete your submission for ${event} first (submit ${EVENT_TYPES_MAP[event]})`;
-  }
-
   const event = interaction.options.getString("name")?.toUpperCase();
   if (isValidEventType(event)) {
+    const existing = await getSubmissionForEvent(interaction.user.id, event);
+
+    if (existing?.complete) {
+      const msg = await interaction.reply({
+        content: `**[REPLY TO SUBMIT ${event}]** You've already submitted for ${event}, but you can reply to this to submit another file/link`,
+        fetchReply: true,
+      });
+      existing.replyRef = msg.id;
+      await existing.save();
+      return;
+    }
+
+    const msg = await interaction.reply({
+      content: `**[REPLY TO SUBMIT ${event}]** Please send ${EVENT_TYPES_MAP[event]}`,
+      fetchReply: true,
+    });
+
     const submission = new SubmissionModel({
       userIds: [interaction.user.id],
       complete: false,
-      eventType: event,
+      event: event,
+      replyRef: msg.id,
     });
     await submission.save();
-    return `Please submit ${EVENT_TYPES_MAP[event]}`;
+  } else {
+    interaction.reply("Invalid event submitted D:");
   }
-  return "Invalid event submitted D:";
+}
+
+export async function processSubmissionContent(message: Message) {
+  const user = message.author.id;
+  const submission = await getSubmissionForReply(message);
+  if (!submission) return;
+
+  let content = message.content;
+  const attachment = message.attachments.first();
+  if (attachment) {
+    content = attachment.url;
+  }
+
+  if (!submission.content) {
+    submission.content = [content];
+  } else {
+    submission.content.push(content);
+  }
+
+  submission.complete = true;
+  await submission.save();
+  const reply = await message.reply(
+    `Succesfully submitted \`${content}\` for ${submission.event}. To attach more, reply again to the message above.`
+  );
 }
 
 /** Validate the new submission via reaction */
