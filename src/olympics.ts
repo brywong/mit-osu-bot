@@ -1,6 +1,6 @@
 /*** Bot's Olympics functionality ***/
 
-import { CommandInteraction, Formatters, Client, Message } from "discord.js";
+import { CommandInteraction, Formatters, Client, Message, User } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
 import { getLeaderboard } from "./utils";
@@ -12,6 +12,17 @@ async function getIncompleteSubmission(
     userIds: { $elemMatch: { $eq: userId } },
     complete: false,
   });
+}
+
+async function deleteSubmission(
+    userId: string,
+    event: EventType
+) {
+    return await SubmissionModel.deleteOne({
+        userIds: { $elemMatch: {$eq: userId}},
+        event: event,
+        complete: true,
+    })
 }
 
 async function getSubmissionForEvent(
@@ -171,12 +182,22 @@ export async function viewSubmissions(
 }
 
 /** Validate the new submission via reaction */
-function invalidateSubmission(interaction: CommandInteraction): boolean {
+export async function invalidateSubmission(interaction: CommandInteraction): Promise<boolean> {
   /*
         Allows judges to invalidate a specified user's submission 
         for an event via /invalid @user <EVENT_NAME>. Updates the databse
     */
-  return false;
+  const uid = interaction.options.getUser("user")
+  const event = interaction.options.getString("name")?.toUpperCase()
+
+  if (uid && isValidEventType(event)) {
+      const existing = await deleteSubmission(uid.id, event)
+      if (existing["deletedCount"] == 1) {
+          return true
+      }
+      return false
+  }
+  return false
 }
 
 /** Get the current board of submissions for users */
@@ -187,19 +208,19 @@ export async function getOlympicsBoard(client: Client): Promise<string> {
     */
   const result: Submission[] = await SubmissionModel.find({ complete: true });
   const eventsPerPersons: { [key: string]: number } = {};
-  for (var i = 0; i < result.length; i++) {
+  for (let i = 0; i < result.length; i++) {
     const s = result[i];
     const userids = s.userIds;
-    for (var j = 0; j < userids.length; j++) {
+    for (let j = 0; j < userids.length; j++) {
       const uid = userids[j];
-      const User = await client.users.fetch(uid, { cache: true });
-      if (User === undefined) {
+      const user = await client.users.fetch(uid, { cache: true });
+      if (user === undefined) {
         throw "User doesn't exist?! Unexpected";
       }
-      if (uid in eventsPerPersons) {
-        eventsPerPersons[User.tag] += 1;
+      if (user.tag in eventsPerPersons) {
+        eventsPerPersons[user.tag] += 1;
       } else {
-        eventsPerPersons[User.tag] = 1;
+        eventsPerPersons[user.tag] = 1;
       }
     }
   }

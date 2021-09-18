@@ -9,6 +9,7 @@ import { checkIsAdmin } from "./src/regular";
 import {
   registerSubmission,
   processSubmissionContent,
+  invalidateSubmission,
   getOlympicsBoard,
   viewSubmissions,
 } from "./src/olympics";
@@ -43,7 +44,19 @@ const commands = [
     ),
   new SlashCommandBuilder()
     .setName("invalid")
-    .setDescription("Invalidates an entry. Can only be used by Olympics admin"),
+    .setDescription("Invalidates an entry. Can only be used by Olympics admin")
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Abbreviated event name")
+        .setRequired(true)
+    )
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("User whose event we are invalidating")
+        .setRequired(true)
+    ),
   new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("View Oly leaderboard (only number of submissions)"),
@@ -87,7 +100,12 @@ client.on("interactionCreate", async (interaction) => {
     await registerSubmission(interaction);
   } else if (commandName === "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
-      await interaction.reply("Not Implemented Error!!");
+      const success = await invalidateSubmission(interaction);
+      if (success) {
+        interaction.reply("Successfully deleted")
+      } else {
+        interaction.reply("Failed to delete for some reason D:")
+      }
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
@@ -108,6 +126,8 @@ client.on("messageCreate", async (message) => {
     message.mentions.repliedUser?.id === client.user.id
   ) {
     processSubmissionContent(message);
+  } else if (message.content.includes("<:eh")) {
+    message.reply("<:eh:883119732105019423>")
   }
 });
 
