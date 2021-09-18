@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { Client, CommandInteraction } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 
 export const EVENT_TYPES_MAP = {
@@ -49,5 +49,5 @@ export interface MitOsuCommand {
 
   slashCommand: ReturnType<SlashCommandBuilder["toJSON"]>;
 
-  handle: (interaction: CommandInteraction) => Promise<void>;
+  handle: (interaction: CommandInteraction, client: Client) => Promise<void>;
 }
