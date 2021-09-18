@@ -34,7 +34,9 @@ const LeaderboardCommand: MitOsuCommand = {
         }
       }
     }
-    const orderedPeople = Object.keys(eventsPerPersons).sort();
+    const orderedPeople = Object.keys(eventsPerPersons).sort(
+      (e1, e2) => eventsPerPersons[e2] - eventsPerPersons[e1]
+    );
     const response = Formatters.codeBlock(
       orderedPeople
         .map((name, idx) => `${idx + 1} ${name}: ${eventsPerPersons[name]}`)
