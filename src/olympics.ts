@@ -2,12 +2,8 @@
 
 import { CommandInteraction } from "discord.js"
 import { SubmissionModel } from "../models/submission";
-import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types"
-
-/** Generic Olympics POST */
-function POST(uname: String, event: EventType, content: string): boolean {
-    return false;
-}
+import { EVENT_TYPES_MAP, isValidEventType } from "../types"
+import { getLeaderboard } from "./utils"
 
 /** Register a new submission */
 export function registerSubmission(interaction: CommandInteraction): string {
@@ -38,5 +34,5 @@ function getOlympicsBoard() {
         Gets the current board of Olympics submissions (just a table of
         users to things they submitted)
     */
-    return {};
+    const leaderboard = getLeaderboard()
 }
