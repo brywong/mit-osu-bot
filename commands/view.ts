@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageEmbed, MessagePayload } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { isValidEventType } from "../types";
+import { getUsersForSubmissions } from "../utils";
 
 const ViewCommand: MitOsuCommand = {
   name: "view",
@@ -39,18 +40,7 @@ const ViewCommand: MitOsuCommand = {
     }
 
     const submissions: Submission[] = await SubmissionModel.find(filter);
-    const uids = new Set(
-      submissions
-        .map((s) => s.userIds)
-        .reduce((acc, cur) => [...acc, ...cur], [])
-    );
-
-    const uidsToUsername: { [key: string]: string } = {};
-    for (const uid of uids) {
-      uidsToUsername[uid] = (
-        await client.users.fetch(uid, { cache: true })
-      ).tag;
-    }
+    const usersById = await getUsersForSubmissions(client, submissions);
 
     let title: string;
     if (user && event) {
@@ -62,7 +52,7 @@ const ViewCommand: MitOsuCommand = {
     }
 
     const submissionFields = submissions.map((submission) => {
-      const usernames = submission.userIds.map((uid) => uidsToUsername[uid]);
+      const usernames = submission.userIds.map((uid) => usersById[uid].tag);
       return {
         name: `Event ${submission.event} by ${usernames.join(", ")}`,
         value: submission.content!.join("\n"),

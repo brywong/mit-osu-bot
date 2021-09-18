@@ -2,6 +2,7 @@ import { MitOsuCommand } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { Formatters } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
+import { getUsersForSubmissions } from "../utils";
 
 const LeaderboardCommand: MitOsuCommand = {
   /*
@@ -18,14 +19,14 @@ const LeaderboardCommand: MitOsuCommand = {
   handle: async (interaction, client) => {
     const result: Submission[] = await SubmissionModel.find({ complete: true });
     const eventsPerPersons: { [key: string]: number } = {};
-    for (let i = 0; i < result.length; i++) {
-      const s = result[i];
-      const userids = s.userIds;
-      for (let j = 0; j < userids.length; j++) {
-        const uid = userids[j];
-        const user = await client.users.fetch(uid, { cache: true });
-        if (user === undefined) {
-          throw "User doesn't exist?! Unexpected";
+    const usersById = await getUsersForSubmissions(client, result);
+
+    for (const submission of result) {
+      for (const uid of submission.userIds) {
+        const user = usersById[uid];
+        if (!user) {
+          await interaction.reply("Unexpected error: can't find user");
+          return;
         }
         if (user.tag in eventsPerPersons) {
           eventsPerPersons[user.tag] += 1;

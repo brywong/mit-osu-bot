@@ -63,3 +63,24 @@ const ADMIN_UIDS = ["401460835232382986", "151462465404796929"];
 export function checkIsAdmin(uid: string): boolean {
   return ADMIN_UIDS.includes(uid);
 }
+
+export async function getUsers(
+  client: Client,
+  uids: string[]
+): Promise<{ [key: string]: User }> {
+  const users = (
+    await Promise.all(
+      uids.map((uid) => client.users.fetch(uid, { cache: true }))
+    )
+  ).filter((user) => !!user);
+
+  return Object.fromEntries(users.map((user) => [user.id, user]));
+}
+
+export function getUsersForSubmissions(
+  client: Client,
+  submissions: Submission[]
+): Promise<{ [key: string]: User }> {
+  const uids = new Set(submissions.map((s) => s.userIds).flat());
+  return getUsers(client, [...uids]);
+}

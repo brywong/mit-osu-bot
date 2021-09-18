@@ -17,6 +17,12 @@ const SubmitCommand: MitOsuCommand = {
         .setDescription("Abbreviated event name")
         .setRequired(true)
     )
+    .addStringOption((option) =>
+      option
+        .setName("users")
+        .setDescription("(for team events) Other users to submit for")
+        .setRequired(true)
+    )
     .toJSON(),
 
   handle: async (interaction) => {

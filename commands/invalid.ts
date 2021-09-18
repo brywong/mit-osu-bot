@@ -42,23 +42,18 @@ const InvalidCommand: MitOsuCommand = {
 export async function invalidateSubmission(
   interaction: CommandInteraction
 ): Promise<string> {
-  const uid = interaction.options.getUser("user");
+  const user = interaction.options.getUser("user");
   const event = interaction.options.getString("event")?.toUpperCase();
 
   if (isValidEventType(event)) {
-    let existing: any;
-    if (uid) {
-      existing = await deleteSubmission(uid.id, event);
-    } else {
-      const callerid = interaction.user;
-      existing = await deleteSubmission(callerid.id, event);
-    }
+    const targetUser = user ?? interaction.user;
+    const existing = await deleteSubmission(targetUser.id, event);
 
     if (existing["deletedCount"] === 1) {
       if (event === "B9") {
         return "Deleted your feet pics :<";
       } else {
-        return `Successfully deleted ${event}`;
+        return `Successfully deleted ${event} from ${targetUser}`;
       }
     }
     return `No submission for ${event} found`;
