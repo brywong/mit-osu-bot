@@ -3,11 +3,7 @@
 import { CommandInteraction } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-
-/** Generic Olympics POST */
-function POST(uname: String, event: EventType, content: string): boolean {
-  return false;
-}
+import { getLeaderboard } from "./utils";
 
 async function getIncompleteSubmission(
   userId: string
