@@ -61,7 +61,7 @@ export async function invalidateSubmission(
         return `Successfully deleted ${event}`;
       }
     }
-    return "Failed to delete D:";
+    return `No submission for ${event} found`;
   }
   return "Invalid user or event type";
 }
