@@ -193,16 +193,25 @@ export async function viewSubmissions(
     };
   });
 
-  interaction.reply(
+  // Potentially split the reponse into multiple messages, to avoid going over the embed size limit
+  const PAGE_SIZE = 10;
+
+  const makePayload = (startIndex: number) =>
     new MessagePayload(interaction, {
       embeds: [
         new MessageEmbed()
           .setColor("#0099ff")
           .setTitle(title)
-          .addFields(submissionFields),
+          .addFields(
+            submissionFields.slice(startIndex, startIndex + PAGE_SIZE)
+          ),
       ],
-    })
-  );
+    });
+
+  interaction.reply(makePayload(0));
+  for (let i = PAGE_SIZE; i < submissionFields.length; i += PAGE_SIZE) {
+    interaction.followUp(makePayload(i));
+  }
 }
 
 /** Validate the new submission via reaction */
