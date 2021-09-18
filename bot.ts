@@ -58,6 +58,15 @@ const commands = [
         .setRequired(true)
     ),
   new SlashCommandBuilder()
+    .setName("deletemy")
+    .setDescription("Invalidates one of your own entries")
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Abbreviated event name")
+        .setRequired(true)
+    ),
+  new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("View Oly leaderboard (only number of submissions)"),
   new SlashCommandBuilder()
@@ -92,9 +101,11 @@ client.once("ready", () => {
 // new slash commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
-  if (interaction.channelId !== "661656176244686861"
-    && interaction.channelId !== "886422700510281778") {
-      return;
+  if (
+    interaction.channelId !== "661656176244686861" &&
+    interaction.channelId !== "886422700510281778"
+  ) {
+    return;
   }
 
   const { commandName } = interaction;
@@ -104,15 +115,14 @@ client.on("interactionCreate", async (interaction) => {
     await registerSubmission(interaction);
   } else if (commandName === "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
-      const success = await invalidateSubmission(interaction);
-      if (success) {
-        interaction.reply("Successfully deleted")
-      } else {
-        interaction.reply("Failed to delete for some reason D:")
-      }
+      const message = await invalidateSubmission(interaction);
+      interaction.reply(message);
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
+  } else if (commandName === "deletemy") {
+    const message = await invalidateSubmission(interaction);
+    interaction.reply(message);
   } else if (commandName === "leaderboard" || commandName === "lb") {
     const board = await getOlympicsBoard(client);
     await interaction.reply(board);
@@ -131,7 +141,7 @@ client.on("messageCreate", async (message) => {
   ) {
     processSubmissionContent(message);
   } else if (message.content.includes("<:eh")) {
-    message.reply("<:eh:883119732105019423>")
+    message.reply("<:eh:883119732105019423>");
   }
 });
 

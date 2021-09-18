@@ -1,6 +1,12 @@
 /*** Bot's Olympics functionality ***/
 
-import { CommandInteraction, Formatters, Client, Message, User } from "discord.js";
+import {
+  CommandInteraction,
+  Formatters,
+  Client,
+  Message,
+  User,
+} from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
 import { getLeaderboard } from "./utils";
@@ -14,15 +20,12 @@ async function getIncompleteSubmission(
   });
 }
 
-async function deleteSubmission(
-    userId: string,
-    event: EventType
-) {
-    return await SubmissionModel.deleteOne({
-        userIds: { $elemMatch: {$eq: userId}},
-        event: event,
-        complete: true,
-    })
+async function deleteSubmission(userId: string, event: EventType) {
+  return await SubmissionModel.deleteOne({
+    userIds: { $elemMatch: { $eq: userId } },
+    event: event,
+    complete: true,
+  });
 }
 
 async function getSubmissionForEvent(
@@ -182,22 +185,35 @@ export async function viewSubmissions(
 }
 
 /** Validate the new submission via reaction */
-export async function invalidateSubmission(interaction: CommandInteraction): Promise<boolean> {
+export async function invalidateSubmission(
+  interaction: CommandInteraction
+): Promise<string> {
   /*
         Allows judges to invalidate a specified user's submission 
         for an event via /invalid @user <EVENT_NAME>. Updates the databse
     */
-  const uid = interaction.options.getUser("user")
-  const event = interaction.options.getString("name")?.toUpperCase()
+  const uid = interaction.options.getUser("user");
+  const event = interaction.options.getString("name")?.toUpperCase();
 
-  if (uid && isValidEventType(event)) {
-      const existing = await deleteSubmission(uid.id, event)
-      if (existing["deletedCount"] == 1) {
-          return true
+  if (isValidEventType(event)) {
+    let existing: any;
+    if (uid) {
+      existing = await deleteSubmission(uid.id, event);
+    } else {
+      const callerid = interaction.user;
+      existing = await deleteSubmission(callerid.id, event);
+    }
+
+    if (existing["deletedCount"] == 1) {
+      if (event == "B9") {
+        return "Deleted your feet pics :<";
+      } else {
+        return "successfully deleted";
       }
-      return false
+    }
+    return "Failed to delete D:";
   }
-  return false
+  return "Invalid user or event type";
 }
 
 /** Get the current board of submissions for users */
