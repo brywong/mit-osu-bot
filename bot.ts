@@ -76,7 +76,7 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
   } else if (commandName == "leaderboard" || commandName == "lb") {
-    const board = await getOlympicsBoard()
+    const board = await getOlympicsBoard(client)
     await interaction.reply(board);
   }
 });
