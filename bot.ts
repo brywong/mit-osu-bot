@@ -10,6 +10,7 @@ import {
   registerSubmission,
   processSubmissionContent,
   getOlympicsBoard,
+  viewSubmissions,
 } from "./src/olympics";
 import Database from "./db";
 
@@ -49,6 +50,15 @@ const commands = [
   new SlashCommandBuilder()
     .setName("lb")
     .setDescription("View Oly leaderboard (only number of submissions)"),
+  new SlashCommandBuilder()
+    .setName("submissions")
+    .setDescription("View submissions by a user and/or event type")
+    .addStringOption((option) =>
+      option.setName("event").setDescription("Event to filter by")
+    )
+    .addUserOption((option) =>
+      option.setName("user").setDescription("User to filter by")
+    ),
 ].map((cmd) => cmd.toJSON());
 
 async function registerSlashCommands() {
@@ -73,17 +83,19 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName } = interaction;
   if (commandName === "twig") {
     await interaction.reply("chika");
-  } else if (commandName == "submit") {
+  } else if (commandName === "submit") {
     await registerSubmission(interaction);
-  } else if (commandName == "invalid") {
+  } else if (commandName === "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       await interaction.reply("Not Implemented Error!!");
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
     }
-  } else if (commandName == "leaderboard" || commandName == "lb") {
-    const board = await getOlympicsBoard(client)
+  } else if (commandName === "leaderboard" || commandName === "lb") {
+    const board = await getOlympicsBoard(client);
     await interaction.reply(board);
+  } else if (commandName === "submissions") {
+    await viewSubmissions(client, interaction);
   }
 });
 

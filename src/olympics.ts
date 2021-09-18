@@ -127,6 +127,49 @@ export async function processSubmissionContent(message: Message) {
   );
 }
 
+export async function viewSubmissions(
+  client: Client,
+  interaction: CommandInteraction
+) {
+  const user = interaction.options.getUser("user");
+  const event = interaction.options.getString("event");
+  if (!user && !event) {
+    interaction.reply("At least one option must be specified");
+    return;
+  }
+
+  const filter: any = { complete: true };
+  if (user) {
+    filter.userIds = { $elemMatch: { $eq: user.id } };
+  }
+  if (event) {
+    if (!isValidEventType(event)) {
+      interaction.reply(`${event} is not a valid event`);
+      return;
+    }
+
+    filter.event = event;
+  }
+
+  const submissions: Submission[] = await SubmissionModel.find(filter);
+  const uids = new Set(
+    submissions.map((s) => s.userIds).reduce((acc, cur) => [...acc, ...cur], [])
+  );
+
+  const uidsToUsername: { [key: string]: string } = {};
+  for (const uid of uids) {
+    uidsToUsername[uid] = (await client.users.fetch(uid, { cache: true })).tag;
+  }
+
+  const submissionStrings = submissions.map(
+    (submission) =>
+      `Event ${submission.event} by ${submission.userIds
+        .map((uid) => uidsToUsername[uid])
+        .join(", ")}: ${submission.content?.join("\n")}`
+  );
+  interaction.reply(submissionStrings.join("\n\n"));
+}
+
 /** Validate the new submission via reaction */
 function invalidateSubmission(interaction: CommandInteraction): boolean {
   /*
