@@ -94,7 +94,7 @@ client.on("interactionCreate", async (interaction) => {
       if (success) {
         interaction.reply("Successfully deleted")
       } else {
-        interaction.reply("Failed to delete for some reaosn D:")
+        interaction.reply("Failed to delete for some reason D:")
       }
     } else {
       await interaction.reply("Non-admins can't invalidate entries D:");
@@ -114,6 +114,8 @@ client.on("messageCreate", async (message) => {
     message.mentions.repliedUser?.id === client.user.id
   ) {
     processSubmissionContent(message);
+  } else if (message.content.includes("<:eh")) {
+    message.reply("<:eh:883119732105019423>")
   }
 });
 
