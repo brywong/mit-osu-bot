@@ -11,49 +11,12 @@ import {
 } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
 import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-import { getLeaderboard } from "./utils";
-
-async function getIncompleteSubmission(
-  userId: string
-): Promise<Submission | undefined> {
-  return await SubmissionModel.findOne({
-    userIds: { $elemMatch: { $eq: userId } },
-    complete: false,
-  });
-}
-
-async function deleteSubmission(userId: string, event: EventType) {
-  return await SubmissionModel.deleteOne({
-    userIds: { $elemMatch: { $eq: userId } },
-    event: event,
-    complete: true,
-  });
-}
-
-async function getSubmissionForEvent(
-  userId: string,
-  event: EventType
-): Promise<Submission | undefined> {
-  return await SubmissionModel.findOne({
-    userIds: { $elemMatch: { $eq: userId } },
-    event,
-  });
-}
-
-async function getSubmissionForReply(
-  message: Message
-): Promise<Submission | undefined> {
-  const messageId = message.reference?.messageId;
-  const userId = message.author.id;
-  if (!messageId) {
-    return;
-  }
-
-  return await SubmissionModel.findOne({
-    userIds: { $elemMatch: { $eq: userId } },
-    replyRef: messageId,
-  });
-}
+import {
+  getLeaderboard,
+  getSubmissionForEvent,
+  getSubmissionForReply,
+  deleteSubmission,
+} from "../utils";
 
 /** Register a new submission */
 export async function registerSubmission(interaction: CommandInteraction) {

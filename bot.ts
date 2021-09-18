@@ -5,14 +5,14 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 
 import { Routes } from "discord-api-types/v9";
 
-import { checkIsAdmin } from "./src/regular";
+import { checkIsAdmin } from "./commands/regular";
 import {
   registerSubmission,
   processSubmissionContent,
   invalidateSubmission,
   getOlympicsBoard,
   viewSubmissions,
-} from "./src/olympics";
+} from "./commands/olympics";
 import Database from "./db";
 
 Database.init();
