@@ -7,15 +7,14 @@ import { Routes } from "discord-api-types/v9";
 
 import { checkIsAdmin } from "./commands/regular";
 import {
-  registerSubmission,
-  processSubmissionContent,
   invalidateSubmission,
   getOlympicsBoard,
   viewSubmissions,
 } from "./commands/olympics";
 import Database from "./db";
 
-import SubmitCommand from "./commands/submit";
+import SubmitCommand, { processSubmissionContent } from "./commands/submit";
+import TwigCommand from "./commands/twig";
 
 Database.init();
 const client = new Client({
@@ -26,13 +25,10 @@ const guildId = "661656176244686858";
 const clientId = "888306044558802965";
 const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
 
-const commands = [SubmitCommand];
+const commands = [SubmitCommand, TwigCommand];
 const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
 
 const oldCommands = [
-  new SlashCommandBuilder()
-    .setName("twig")
-    .setDescription("Replies with 'chika'"),
   new SlashCommandBuilder()
     .setName("invalid")
     .setDescription("Invalidates an entry. Can only be used by Olympics admin")
@@ -106,9 +102,7 @@ client.on("interactionCreate", async (interaction) => {
     await commandsMap[commandName].handle(interaction);
   }
 
-  if (commandName === "twig") {
-    await interaction.reply("chika");
-  } else if (commandName === "invalid") {
+  if (commandName === "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       const message = await invalidateSubmission(interaction);
       interaction.reply(message);

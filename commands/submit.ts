@@ -1,13 +1,9 @@
 import { MitOsuCommand } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { SubmissionModel, Submission } from "../models/submission";
-import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-import {
-  getLeaderboard,
-  getSubmissionForEvent,
-  getSubmissionForReply,
-  deleteSubmission,
-} from "../utils";
+import { SubmissionModel } from "../models/submission";
+import { EVENT_TYPES_MAP, isValidEventType } from "../types";
+import { getSubmissionForEvent, getSubmissionForReply } from "../utils";
+import { Message } from "discord.js";
 
 const SubmitCommand: MitOsuCommand = {
   name: "submit",
@@ -81,5 +77,29 @@ const SubmitCommand: MitOsuCommand = {
     await submission.save();
   },
 };
+
+export async function processSubmissionContent(message: Message) {
+  const user = message.author.id;
+  const submission = await getSubmissionForReply(message);
+  if (!submission) return;
+
+  let content = message.content;
+  const attachment = message.attachments.first();
+  if (attachment) {
+    content = attachment.url;
+  }
+
+  if (!submission.content) {
+    submission.content = [content];
+  } else {
+    submission.content.push(content);
+  }
+
+  submission.complete = true;
+  await submission.save();
+  await message.reply(
+    `Succesfully submitted \`${content}\` for ${submission.event}. To attach more, reply again to the message above.`
+  );
+}
 
 export default SubmitCommand;
