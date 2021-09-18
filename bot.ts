@@ -82,6 +82,10 @@ client.once("ready", () => {
 // new slash commands
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
+  if (interaction.channelId !== "661656176244686861"
+    && interaction.channelId !== "886422700510281778") {
+      return;
+  }
 
   const { commandName } = interaction;
   if (commandName === "twig") {
