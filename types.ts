@@ -27,7 +27,7 @@ export const EVENT_TYPES_MAP = {
   C2: "a text file attachment",
   C3: "a screenshot or video",
   C4: "an image or video",
-  C5: "a multiple screenshots, one for each of your scores",
+  C5: "multiple screenshots, one for each of your scores",
   C6: "a text file attachment",
   C7: "a text file attachment",
   C8: "a video with audio added to replay",
