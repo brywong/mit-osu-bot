@@ -1,23 +1,8 @@
 import { MitOsuCommand } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  CommandInteraction,
-  Formatters,
-  Client,
-  Message,
-  User,
-  MessageEmbed,
-  MessagePayload,
-} from "discord.js";
-import { SubmissionModel, Submission } from "../models/submission";
-import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-import {
-  getLeaderboard,
-  getSubmissionForEvent,
-  getSubmissionForReply,
-  deleteSubmission,
-  checkIsAdmin,
-} from "../utils";
+import { CommandInteraction } from "discord.js";
+import { isValidEventType } from "../types";
+import { deleteSubmission, checkIsAdmin } from "../utils";
 
 const InvalidCommand: MitOsuCommand = {
   /*

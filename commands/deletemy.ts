@@ -1,23 +1,5 @@
 import { MitOsuCommand } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  CommandInteraction,
-  Formatters,
-  Client,
-  Message,
-  User,
-  MessageEmbed,
-  MessagePayload,
-} from "discord.js";
-import { SubmissionModel, Submission } from "../models/submission";
-import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-import {
-  getLeaderboard,
-  getSubmissionForEvent,
-  getSubmissionForReply,
-  deleteSubmission,
-  checkIsAdmin,
-} from "../utils";
 
 // TODO: consider extracting invalidateSubmission to some shared file rather than importing across commands
 import { invalidateSubmission } from "./invalid";

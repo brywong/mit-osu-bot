@@ -1,11 +1,9 @@
-import { Client, Intents, Options } from "discord.js";
+import { Client, Intents } from "discord.js";
 import { BOT_TOKEN } from "./config.json";
 import { REST } from "@discordjs/rest";
-import { SlashCommandBuilder } from "@discordjs/builders";
 
 import { Routes } from "discord-api-types/v9";
 
-import { getOlympicsBoard, viewSubmissions } from "./commands/olympics";
 import Database from "./db";
 
 import SubmitCommand, { processSubmissionContent } from "./commands/submit";

@@ -1,23 +1,8 @@
 import { MitOsuCommand } from "../types";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  CommandInteraction,
-  Formatters,
-  Client,
-  Message,
-  User,
-  MessageEmbed,
-  MessagePayload,
-} from "discord.js";
+import { MessageEmbed, MessagePayload } from "discord.js";
 import { SubmissionModel, Submission } from "../models/submission";
-import { EVENT_TYPES_MAP, isValidEventType, EventType } from "../types";
-import {
-  getLeaderboard,
-  getSubmissionForEvent,
-  getSubmissionForReply,
-  deleteSubmission,
-  checkIsAdmin,
-} from "../utils";
+import { isValidEventType } from "../types";
 
 const ViewCommand: MitOsuCommand = {
   name: "view",
