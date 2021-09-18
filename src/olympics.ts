@@ -5,6 +5,7 @@ import {
   Formatters,
   Client,
   Message,
+  User,
   MessageEmbed,
   MessagePayload,
 } from "discord.js";
@@ -217,7 +218,7 @@ export async function viewSubmissions(
 /** Validate the new submission via reaction */
 export async function invalidateSubmission(
   interaction: CommandInteraction
-): Promise<boolean> {
+): Promise<string> {
   /*
         Allows judges to invalidate a specified user's submission 
         for an event via /invalid @user <EVENT_NAME>. Updates the databse
@@ -225,14 +226,25 @@ export async function invalidateSubmission(
   const uid = interaction.options.getUser("user");
   const event = interaction.options.getString("name")?.toUpperCase();
 
-  if (uid && isValidEventType(event)) {
-    const existing = await deleteSubmission(uid.id, event);
-    if (existing["deletedCount"] == 1) {
-      return true;
+  if (isValidEventType(event)) {
+    let existing: any;
+    if (uid) {
+      existing = await deleteSubmission(uid.id, event);
+    } else {
+      const callerid = interaction.user;
+      existing = await deleteSubmission(callerid.id, event);
     }
-    return false;
+
+    if (existing["deletedCount"] == 1) {
+      if (event == "B9") {
+        return "Deleted your feet pics :<";
+      } else {
+        return "successfully deleted";
+      }
+    }
+    return "Failed to delete D:";
   }
-  return false;
+  return "Invalid user or event type";
 }
 
 /** Get the current board of submissions for users */
