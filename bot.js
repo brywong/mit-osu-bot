@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const config_json_1 = require("./config.json");
@@ -16,6 +19,8 @@ const builders_1 = require("@discordjs/builders");
 const v9_1 = require("discord-api-types/v9");
 const regular_1 = require("./src/regular");
 const olympics_1 = require("./src/olympics");
+const db_1 = __importDefault(require("./db"));
+db_1.default.init();
 const client = new discord_js_1.Client({ intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES] });
 const guildId = '661656176244686858';
 const clientId = '888306044558802965';

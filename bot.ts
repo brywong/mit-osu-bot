@@ -7,7 +7,9 @@ import { Routes } from 'discord-api-types/v9'
 
 import { checkIsAdmin } from './src/regular';
 import { registerSubmission } from './src/olympics';
+import Database from "./db"
 
+Database.init();
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] })
 
 const guildId = '661656176244686858';
