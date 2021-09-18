@@ -1,3 +1,6 @@
+import { CommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
+
 export const EVENT_TYPES_MAP = {
   F1: "a screenshot",
   F2: "a screenshot",
@@ -40,3 +43,11 @@ export function isValidEventType(
 }
 
 export type EventType = keyof typeof EVENT_TYPES_MAP;
+
+export interface MitOsuCommand {
+  name: string;
+
+  slashCommand: ReturnType<SlashCommandBuilder["toJSON"]>;
+
+  handle: (interaction: CommandInteraction) => Promise<void>;
+}

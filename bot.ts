@@ -15,6 +15,8 @@ import {
 } from "./commands/olympics";
 import Database from "./db";
 
+import SubmitCommand from "./commands/submit";
+
 Database.init();
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -24,24 +26,13 @@ const guildId = "661656176244686858";
 const clientId = "888306044558802965";
 const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
 
-const commands = [
+const commands = [SubmitCommand];
+const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
+
+const oldCommands = [
   new SlashCommandBuilder()
     .setName("twig")
     .setDescription("Replies with 'chika'"),
-  new SlashCommandBuilder()
-    .setName("submit")
-    .setDescription("Submit an entry for osu! olympics")
-    .addStringOption((option) =>
-      option
-        .setName("event")
-        .setDescription("Abbreviated event name")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("users")
-        .setDescription("Other users to submit for (for team events)")
-    ),
   new SlashCommandBuilder()
     .setName("invalid")
     .setDescription("Invalidates an entry. Can only be used by Olympics admin")
@@ -83,13 +74,15 @@ const commands = [
     ),
 ].map((cmd) => cmd.toJSON());
 
+const slashCommands = [...commands.map((c) => c.slashCommand), ...oldCommands];
+
 async function registerSlashCommands() {
   console.log("Registering slash commands");
 
   await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-    body: commands,
+    body: slashCommands,
   });
-  console.log(`Successfully registered ${commands.length} command(s)`);
+  console.log(`Successfully registered ${slashCommands.length} command(s)`);
 }
 
 registerSlashCommands();
@@ -109,10 +102,12 @@ client.on("interactionCreate", async (interaction) => {
   }
 
   const { commandName } = interaction;
+  if (commandName in commandsMap) {
+    await commandsMap[commandName].handle(interaction);
+  }
+
   if (commandName === "twig") {
     await interaction.reply("chika");
-  } else if (commandName === "submit") {
-    await registerSubmission(interaction);
   } else if (commandName === "invalid") {
     if (checkIsAdmin(interaction.user.id)) {
       const message = await invalidateSubmission(interaction);
