@@ -1,5 +1,5 @@
 import { Client, Intents } from "discord.js";
-import { BOT_TOKEN } from "./config.json";
+import { BOT_TOKEN, CLIENT_ID, GUILD_IDS } from "./config.json";
 import { REST } from "@discordjs/rest";
 
 import { Routes } from "discord-api-types/v9";
@@ -15,36 +15,50 @@ import LeaderboardCommand from "./commands/leaderboard";
 
 Database.init();
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
+  partials: ["CHANNEL"]
 });
 
-const guildIds = ["661656176244686858", "540661791017926657"];
-const clientId = "888306044558802965";
+const guildIds = GUILD_IDS; // list of guild ids
+const clientId = CLIENT_ID; // client id of discord app
 const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
 
-const commands = [
+const globalCommands = [
   SubmitCommand,
-  TwigCommand,
   InvalidCommand,
   DeletemyCommand,
   ViewCommand,
   LeaderboardCommand,
 ];
 
-const commandsMap = Object.fromEntries(commands.map((c) => [c.name, c]));
-const slashCommands = commands.map((c) => c.slashCommand);
+const guildCommands = [TwigCommand];
 
-async function registerSlashCommands(guildId: string) {
-  console.log(`Registering slash commands for ${guildId}`);
+const commandsMap = Object.fromEntries(globalCommands.map((c) => [c.name, c]).concat(guildCommands.map((c) => [c.name, c])));
+const guildSlashCommands = guildCommands.map((c) => c.slashCommand);
+const globalSlashCommands = globalCommands.map((c) => c.slashCommand);
 
-  await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-    body: slashCommands,
+async function registerGlobalSlashCommands() {
+  console.log(`Registering global slash commands`);
+
+  await rest.put(Routes.applicationCommands(clientId), {
+    body: globalSlashCommands,
   });
-  console.log(`Successfully registered ${slashCommands.length} command(s)`);
+  console.log(`Successfully registered ${globalSlashCommands.length} global command(s)`);
 }
 
+async function registerGuildSlashCommands(guildId: string) {
+  console.log(`Registering guild slash commands for ${guildId}`);
+
+  await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+    body: guildSlashCommands,
+  });
+  console.log(`Successfully registered ${guildSlashCommands.length} guild command(s) for ${guildId}`);
+}
+
+registerGlobalSlashCommands();
+
 for (const guildId of guildIds) {
-  registerSlashCommands(guildId);
+  registerGuildSlashCommands(guildId);
 }
 
 client.once("ready", () => {
