@@ -105,6 +105,9 @@ export async function processSubmissionContent(message: Message) {
     content = attachment.url;
   }
 
+  // add timestamp to incoming submissions
+  content += " @ " + new Date().toUTCString();
+
   if (!submission.content) {
     submission.content = [content];
   } else {
