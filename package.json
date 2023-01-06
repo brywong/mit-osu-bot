@@ -5,9 +5,11 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
     "build": "tsc -p ./ --outDir dist",
     "watch": "npm run build -- -w",
-    "start": "npm run build && node dist/bot.js"
+    "start": "npm run build && node dist/bot.js",
+    "postinstall": "npm run tsc"
   },
   "repository": {
     "type": "git",
