@@ -1,11 +1,16 @@
 import mongoose from "mongoose";
-import { MONGO_SRV } from "./config.json";
+import dotenv from 'dotenv'
 
+dotenv.config()
 export default {
   init: async () => {
     try {
-      await mongoose.connect(MONGO_SRV);
-      console.log("Connected to MongoDB");
+      if (process.env.MONGO_SRV) {
+        await mongoose.connect(process.env.MONGO_SRV);
+        console.log("Connected to MongoDB");
+      } else {
+        throw new Error("MONGO_SRV environment variable not set.")
+      }
     } catch (e) {
       console.log("Error connecting to MongoDB", e);
     }

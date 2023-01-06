@@ -1,10 +1,10 @@
 import { Client, Intents } from "discord.js";
-import { BOT_TOKEN, CLIENT_ID, GUILD_IDS } from "./config.json";
 import { REST } from "@discordjs/rest";
 
 import { Routes } from "discord-api-types/v9";
 
 import Database from "./db";
+import dotenv from 'dotenv'
 
 import SubmitCommand, { processSubmissionContent } from "./commands/submit";
 import TwigCommand from "./commands/twig";
@@ -13,15 +13,18 @@ import DeletemyCommand from "./commands/deletemy";
 import ViewCommand from "./commands/view";
 import LeaderboardCommand from "./commands/leaderboard";
 
+
 Database.init();
+dotenv.config()
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES],
   partials: ["CHANNEL"]
 });
 
-const guildIds = GUILD_IDS; // list of guild ids
-const clientId = CLIENT_ID; // client id of discord app
-const rest = new REST({ version: "9" }).setToken(BOT_TOKEN);
+const guildIds = ["836015307520213042"]
+const clientId = "1060461790309384263";
+const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN || "");
+  
 
 const globalCommands = [
   SubmitCommand,
@@ -92,4 +95,4 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-client.login(BOT_TOKEN);
+client.login(process.env.BOT_TOKEN);
