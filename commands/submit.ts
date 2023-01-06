@@ -26,6 +26,13 @@ const SubmitCommand: MitOsuCommand = {
     .toJSON(),
 
   handle: async (interaction) => {
+    if (interaction.guildId !== null) {
+      await interaction.reply({
+        content: `**ERROR:** You cannot submit entries within a Discord server. Please send me a DM and try again.`
+      });
+      return;
+    }
+
     const event = interaction.options.getString("event")?.toUpperCase();
     const otherUsers = interaction.options.getString("users");
 

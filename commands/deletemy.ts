@@ -19,6 +19,13 @@ const DeletemyCommand: MitOsuCommand = {
     .toJSON(),
 
   handle: async (interaction) => {
+    if (interaction.guildId !== null) {
+      await interaction.reply({
+        content: `**ERROR:** You cannot delete entries within a Discord server. Please send me a DM and try again.`
+      });
+      return;
+    }
+
     const message = await invalidateSubmission(interaction);
     await interaction.reply(message);
   },
