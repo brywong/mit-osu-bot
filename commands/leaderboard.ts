@@ -39,6 +39,7 @@ const LeaderboardCommand: MitOsuCommand = {
       (e1, e2) => eventsPerPersons[e2] - eventsPerPersons[e1]
     );
     const response = Formatters.codeBlock(
+      "Top Number of Submissions:\n" + 
       orderedPeople
         .map((name, idx) => `${idx + 1} ${name}: ${eventsPerPersons[name]}`)
         .join("\n")

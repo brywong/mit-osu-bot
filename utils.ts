@@ -57,7 +57,7 @@ export async function getSubmissionForReply(
   });
 }
 
-const ADMIN_UIDS = ["401460835232382986", "151462465404796929"];
+const ADMIN_UIDS = ["401460835232382986", "151462465404796929", "274628285638508555"];
 
 /** Checks if a user is admin */
 export function checkIsAdmin(uid: string): boolean {
