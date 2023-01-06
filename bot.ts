@@ -88,7 +88,7 @@ client.on("messageCreate", async (message) => {
     message.content.includes("<:eh") &&
     message.author.id !== client.user.id
   ) {
-    message.reply("<:eh:883119732105019423>");
+    message.reply("<:eh:1060817088970768395>");
   }
 });
 
