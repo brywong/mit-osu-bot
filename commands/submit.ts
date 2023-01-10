@@ -106,7 +106,9 @@ export async function processSubmissionContent(message: Message) {
   }
 
   // add timestamp to incoming submissions
-  content += " @ " + new Date().toUTCString();
+  let date = new Date();
+  date.setTime(message.createdTimestamp);
+  content += " @ " + date.toUTCString();
 
   if (!submission.content) {
     submission.content = [content];
