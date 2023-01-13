@@ -98,24 +98,62 @@ const ViewCommand: MitOsuCommand = {
     });
 
     // Potentially split the reponse into multiple messages, to avoid going over the embed size limit
-    const PAGE_SIZE = 10;
 
-    const makePayload = (startIndex: number) =>
+    // Returns index to slice at such that the combined message length is below 1000 characters
+    function getMaxMessages(submissions: { name: string; value: string; }[]) {
+      let limit = 1000;
+      let index = 0;
+      while (limit > 0 && index < submissions.length) {
+        let entry = submissions[index];
+        limit -= (entry.name.length + entry.value.length);
+
+        if (limit >= 0) {
+          index += 1
+        }
+      }
+
+      return index;
+    }
+
+    const makePayload = (startIndex: number, endIndex: number) =>
       new MessagePayload(interaction, {
         embeds: [
           new MessageEmbed()
             .setColor("#0099ff")
             .setTitle(title)
             .addFields(
-              submissionFields.slice(startIndex, startIndex + PAGE_SIZE)
+              submissionFields.slice(startIndex, startIndex + endIndex)
             ),
         ],
-      });
+    });
 
-    interaction.reply(makePayload(0));
-    for (let i = PAGE_SIZE; i < submissionFields.length; i += PAGE_SIZE) {
-      interaction.followUp(makePayload(i));
+    let start = 0;
+    let end = getMaxMessages(submissionFields.slice(start));
+    interaction.reply(makePayload(start, end));
+    while (end < submissionFields.length) {
+      start = end;
+      end += getMaxMessages(submissionFields.slice(start));
+      interaction.followUp(makePayload(start, end));
     }
+
+    // const PAGE_SIZE = 10;
+
+    // const makePayload = (startIndex: number) =>
+    //   new MessagePayload(interaction, {
+    //     embeds: [
+    //       new MessageEmbed()
+    //         .setColor("#0099ff")
+    //         .setTitle(title)
+    //         .addFields(
+    //           submissionFields.slice(startIndex, startIndex + PAGE_SIZE)
+    //         ),
+    //     ],
+    //   });
+
+    // interaction.reply(makePayload(0));
+    // for (let i = PAGE_SIZE; i < submissionFields.length; i += PAGE_SIZE) {
+    //   interaction.followUp(makePayload(i));
+    // }
   },
 };
 
