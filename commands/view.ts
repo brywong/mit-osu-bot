@@ -115,8 +115,27 @@ const ViewCommand: MitOsuCommand = {
       return index;
     }
 
-    const makePayload = (startIndex: number, endIndex: number) =>
-      new MessagePayload(interaction, {
+    const makePayload = (startIndex: number, endIndex: number) => {
+      // entry is longer than 1000 characters and needs to be split up into multiple messages
+      if (startIndex == endIndex) {
+        let newEntry = submissionFields[startIndex];
+        let newValue = newEntry.value.slice(0, 1000);
+        submissionFields[startIndex].value = newEntry.value.slice(1000);
+        return new MessagePayload(interaction, {
+          embeds: [
+            new MessageEmbed()
+              .setColor("#0099ff")
+              .setTitle(title)
+              .addFields(
+                {
+                  name: newEntry.name,
+                  value: newValue
+                }
+              ),
+          ],
+        })
+      }
+      return new MessagePayload(interaction, {
         embeds: [
           new MessageEmbed()
             .setColor("#0099ff")
@@ -125,7 +144,7 @@ const ViewCommand: MitOsuCommand = {
               submissionFields.slice(startIndex, startIndex + endIndex)
             ),
         ],
-    });
+      })};
 
     let start = 0;
     let end = getMaxMessages(submissionFields.slice(start));
