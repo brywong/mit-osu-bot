@@ -29,16 +29,17 @@ const ViewCommand: MitOsuCommand = {
 
     let isAdmin = checkIsAdmin(interaction.user.id);
 
-    if (reveal) {
-      if (!isAdmin) {
-        interaction.reply("**ERROR**: Only admins can reveal submissions.")
-        return;
-      }
-      if (interaction.guildId !== null) {
-        interaction.reply("**ERROR**: Submissions can only be revealed within DMs.")
-        return;
-      }
-    }
+    // Only prevent reveals while event is running
+    // if (reveal) {
+    //   if (!isAdmin) {
+    //     interaction.reply("**ERROR**: Only admins can reveal submissions.")
+    //     return;
+    //   }
+    //   if (interaction.guildId !== null) {
+    //     interaction.reply("**ERROR**: Submissions can only be revealed within DMs.")
+    //     return;
+    //   }
+    // }
 
     if (!user && !event) {
       user = interaction.user!; // if no params provided, filter to current user
